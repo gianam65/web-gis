@@ -51,7 +51,29 @@ body, html {
 }
 
 .search-result {
+    /* margin + height element */
+    max-height: calc(100% - 24px - 12px - 36px);
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding: 5px;
+    font-size: 14px;
+    overflow: auto;
+}
 
+.search-result-item {
+    margin-bottom: 2px;
+    line-height: 22px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #c5c5c5;
+    padding: 2px 0px;
+    transition: 0.15s all linear;
+    cursor: pointer;
+}
+
+.search-result-item:hover {
+    color: #1890ff;
 }
 
 #map {

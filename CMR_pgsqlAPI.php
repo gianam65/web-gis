@@ -18,11 +18,24 @@
         closeDB($paPDO);
     }
 
+    if(isset($_POST['inSearchMode'])) {
+        $paPDO = initDB();
+        $searchValue = $_POST['searchValue'];
+        $mySQLStr = "SELECT name, ST_AsGeoJson(geom) AS geo FROM \"gis_osm_pois_a_free_1\" WHERE name ILIKE '%$searchValue%' and fclass = 'museum' LIMIT 50";
+        $result = query($paPDO, $mySQLStr);
+
+        if ($result != null) {
+            echo json_encode($result);
+        } else {
+            return "[]";
+        }
+    }
+
     function initDB()
     {
         // Kết nối CSDL
         $paPDO = new PDO('pgsql:host=localhost;dbname=TestCSDL;port=5432', 'postgres', '123456');
-        // $db_connection = pg_connect("host=localhost dbname=TestCSDL user=postgres password=123456");
+
         return $paPDO;
     }
     function query($paPDO, $paSQLStr)
@@ -144,15 +157,11 @@
     }
     function getGeoCMRToAjax($paPDO,$paSRID,$paPoint)
     {
-        //echo $paPoint;
-        //echo "<br>";
         $paPoint = str_replace(',', ' ', $paPoint);
-        //echo $paPoint;
-        //echo "<br>";
+        
         // $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"cmr_adm1\" where ST_Within('SRID=4326;POINT(12 5)'::geometry,geom)";
         $mySQLStr = "SELECT ST_AsGeoJson(geom) as geo from \"gadm41_vnm_1\" where ST_Within('SRID=".$paSRID.";".$paPoint."'::geometry,geom)";
-        // echo $mySQLStr;
-        //echo "<br><br>";
+
         $result = query($paPDO, $mySQLStr);
         
         if ($result != null)

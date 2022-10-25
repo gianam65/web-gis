@@ -16,11 +16,10 @@
                 <input 
                     type="text" 
                     class="search-inp"
+                    id="search-location"
                     placeholder="Nhập từ khóa để tìm kiếm"
                 >
-                <div class="search-result">
-
-                </div>
+                <div class="search-result" id="search-result"></div>
             </div>
             <div id="map"></div>
         </div>
@@ -42,6 +41,37 @@
 
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
         <script>
+            const searchBox = document.getElementById("search-location")
+            searchBox.addEventListener("change", (e) => {
+                const searchValue = e.target.value
+                $.ajax({
+                    type: "POST",
+                    url: "CMR_pgsqlAPI.php",
+                    data: { inSearchMode: true, searchValue: searchValue},
+                    success : function (result, status, erro) {
+                        if(result) {
+                            renderSearchResult(JSON.parse(result))
+                        }
+                    },
+                    error: function (req, status, error) {
+                        console.log('error :>> ', error);
+                    }
+                });
+            })
+
+            function renderSearchResult(data) {
+                let htmlElement = '';
+                for(let i = 0; i < data.length; i++) {
+                    htmlElement += `
+                        <div class="search-result-item">${data[i].name}</div>
+                    `;
+                }
+                
+                const searchResultDiv = document.getElementById('search-result')
+                
+                console.log('htmlElement :>> ', htmlElement);
+                searchResultDiv.innerHTML  = htmlElement;
+            }
             var format = 'image/png';
             var map;
             var minX = 8.49874900000009;
@@ -77,7 +107,7 @@
                 map = new ol.Map({
                     target: "map",
                     layers: [layerBG, layerCMR_adm1],
-                    //layers: [layerCMR_adm1],
+                    // layers: [layerCMR_adm1],
                     view: viewMap
                 });
                 // map.getView().fit(bounds, map.getSize());
