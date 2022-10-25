@@ -53,6 +53,7 @@ body, html {
 .search-result {
     /* margin + height element */
     max-height: calc(100% - 24px - 12px - 36px);
+    height: calc(100% - 24px - 12px - 36px);
     display: flex;
     flex-direction: column;
     text-align: left;
@@ -78,4 +79,32 @@ body, html {
 
 #map {
     width: calc(100% - 300px);
+}
+
+.no-data {
+    background-image: url('../img/no-data.png');
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.no-data span {
+    margin-top: 20px;
+    display: block;
+}
+
+.please-enter-search-value {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.please-enter-search-value span {
+    margin-top: 20px;
+    display: block;
+    color: #F50057;
 }

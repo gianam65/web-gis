@@ -49,9 +49,8 @@
                     url: "CMR_pgsqlAPI.php",
                     data: { inSearchMode: true, searchValue: searchValue},
                     success : function (result, status, erro) {
-                        if(result) {
-                            renderSearchResult(JSON.parse(result))
-                        }
+                        const dataToRender = ["Từ khóa tìm kiếm không hợp lệ"].includes(result) ? result : JSON.parse(result || "[]" ); 
+                        renderSearchResult(dataToRender);
                     },
                     error: function (req, status, error) {
                         console.log('error :>> ', error);
@@ -61,28 +60,33 @@
 
             function renderSearchResult(data) {
                 let htmlElement = '';
-                for(let i = 0; i < data.length; i++) {
-                    htmlElement += `
-                        <div class="search-result-item">${data[i].name}</div>
-                    `;
+                const searchResultDiv = document.getElementById('search-result')
+                if(["Từ khóa tìm kiếm không hợp lệ"].includes(data)) {
+                    htmlElement = '<div class="please-enter-search-value"><span>Vui lòng nhập từ khóa tìm kiếm</span></div>';  
+                    searchResultDiv.innerHTML  = htmlElement;
+                    return;
+                }
+                if(data.length == 0) {
+                   htmlElement = '<div class="no-data"><span>Không tìm thấy dữ liệu</span></div>';     
+                } else {
+                    for(let i = 0; i < data.length; i++) {
+                       htmlElement += `
+                            <div class="search-result-item" onclick={moveToLocation(${data[i].geo})}>${data[i].name}</div>
+                        `;
+                    }
                 }
                 
-                const searchResultDiv = document.getElementById('search-result')
-                
-                console.log('htmlElement :>> ', htmlElement);
                 searchResultDiv.innerHTML  = htmlElement;
+            }
+
+            function moveToLocation(listPoint) {
+                console.log('listPoint :>> ', listPoint);
             }
             var format = 'image/png';
             var map;
-            var minX = 8.49874900000009;
-            var minY = 1.65254800000014;
-            var maxX = 16.1921150000001;
-            var maxY = 13.0780600000001;
-            var cenX = (minX + maxX) / 2;
-            var cenY = (minY + maxY) / 2;
-            var mapLat = cenY;
-            var mapLng = cenX;
-            var mapDefaultZoom = 6;
+            var mapLat = 15.917;
+            var mapLng = 107.331;
+            var mapDefaultZoom = 5;
             function initialize_map() {
                 layerBG = new ol.layer.Tile({
                     source: new ol.source.OSM({})
@@ -106,8 +110,8 @@
                 });
                 map = new ol.Map({
                     target: "map",
-                    layers: [layerBG, layerCMR_adm1],
-                    // layers: [layerCMR_adm1],
+                    // layers: [layerBG, layerCMR_adm1],
+                    layers: [layerBG],
                     view: viewMap
                 });
                 // map.getView().fit(bounds, map.getSize());

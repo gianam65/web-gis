@@ -21,13 +21,18 @@
     if(isset($_POST['inSearchMode'])) {
         $paPDO = initDB();
         $searchValue = $_POST['searchValue'];
-        $mySQLStr = "SELECT name, ST_AsGeoJson(geom) AS geo FROM \"gis_osm_pois_a_free_1\" WHERE name ILIKE '%$searchValue%' and fclass = 'museum' LIMIT 50";
-        $result = query($paPDO, $mySQLStr);
 
-        if ($result != null) {
-            echo json_encode($result);
+        if(!$searchValue) {
+            echo "Từ khóa tìm kiếm không hợp lệ";
         } else {
-            return "[]";
+            $mySQLStr = "SELECT name, ST_AsGeoJson(geom) AS geo FROM \"gis_osm_pois_a_free_1\" WHERE name ILIKE '%$searchValue%' and fclass = 'museum' LIMIT 50";
+            $result = query($paPDO, $mySQLStr);
+    
+            if ($result != null) {
+                echo json_encode($result);
+            } else {
+                return "[]";
+            }
         }
     }
 
