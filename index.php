@@ -23,23 +23,35 @@
             </div>
             <div id="map"></div>
         </div>
+        <div class="ol-popup" id="popup">
+            <div id="popup-content"></div>
+        </div>
         <?php include 'CMR_pgsqlAPI.php' ?>
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
         <script>
+            var container = document.getElementById("popup");
+            var content = document.getElementById("popup-content");
+            var overlay = new ol.Overlay({
+                element: container,
+                autoPan: true,
+                autoPanAnimation: {
+                    duration: 250,
+                },
+            });
             var styles = {
-                    'MultiPolygon': new ol.style.Style({
-                        fill: new ol.style.Fill({
-                            color: '#e74c3c'
-                        }),
-                        stroke: new ol.style.Stroke({
-                            color: '#c0392b', 
-                            width: 1
-                        })
+                'MultiPolygon': new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: '#e74c3c'
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: 'black', 
+                        width: 1,
                     })
-                };
+                })
+            };
             var styleFunction = function (feature) {
-                    return styles[feature.getGeometry().getType()];
-                };
+                return styles[feature.getGeometry().getType()];
+            };
             var vectorLayer = new ol.layer.Vector({
                 //source: vectorSource,
                 style: styleFunction
@@ -73,8 +85,8 @@
                    htmlElement = '<div class="no-data"><span>Không tìm thấy dữ liệu</span></div>';     
                 } else {
                     for(let i = 0; i < data.length; i++) {
-                       htmlElement += `
-                            <div class="search-result-item" onclick={moveToLocation(${data[i].geo})}>${data[i].name}</div>
+                        htmlElement += `
+                            <div class="search-result-item" onclick='moveToLocation(${data[i].geo}, "${data[i].name}")'>${data[i].name}</div>
                         `;
                     }
                 }
@@ -82,7 +94,7 @@
                 searchResultDiv.innerHTML  = htmlElement;
             }
 
-            function calcCenterCoordinates(listOfCoordinates) {
+            function calcAVGCoordinates(listOfCoordinates) {
                 if(!listOfCoordinates || !Array.isArray(listOfCoordinates)) return
                 let sumLonCoor = 0;
                 let sumLatCoor = 0;
@@ -95,16 +107,20 @@
                 return [sumLonCoor / lengthOfCoordinates, sumLatCoor / lengthOfCoordinates]
             }
 
-            function moveToLocation(listPoint) {
+            function moveToLocation(listPoint, locationName) {
                 highLightObj(JSON.stringify(listPoint))
                 
-                const centerCoordinates = calcCenterCoordinates(listPoint.coordinates.flat(2))
+                const avgCoordinates = calcAVGCoordinates(listPoint.coordinates.flat(2))
                 map.getView().animate({
-                    center: ol.proj.fromLonLat(centerCoordinates),
+                    center: ol.proj.fromLonLat(avgCoordinates),
                     duration: 2500,
                     zoom: 16,
-                    rotation: 10
                 });
+
+                setTimeout(() => {
+                    $("#popup-content").html(`<div class="location-tooltip">${locationName}</div>`);
+                    overlay.setPosition(ol.proj.fromLonLat(avgCoordinates));
+                }, 2500);
             }
 
             function createJsonObj(result) {     
@@ -188,31 +204,33 @@
                     target: "map",
                     // layers: [layerBG, layerCMR_adm1],
                     layers: [layerBG],
-                    view: viewMap
+                    view: viewMap,
+                    overlays: [overlay],
                 });
                 // map.getView().fit(bounds, map.getSize());
                 
                 map.addLayer(vectorLayer);
 
                 map.on('singleclick', function (evt) {
-                    var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
-                    var lon = lonlat[0];
-                    var lat = lonlat[1];
-                    var myPoint = 'POINT(' + lon + ' ' + lat + ')';
-                    $.ajax({
-                        type: "POST",
-                        url: "CMR_pgsqlAPI.php",
-                        data: {
-                            functionname: 'getGeoCMRToAjax', 
-                            paPoint: myPoint
-                        },
-                        success : function (result, status, erro) {
-                            highLightObj(result);
-                        },
-                        error: function (req, status, error) {
-                            alert(req + " " + status + " " + error);
-                        }
-                    });
+                    return
+                    // var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+                    // var lon = lonlat[0];
+                    // var lat = lonlat[1];
+                    // var myPoint = 'POINT(' + lon + ' ' + lat + ')';
+                    // $.ajax({
+                    //     type: "POST",
+                    //     url: "CMR_pgsqlAPI.php",
+                    //     data: {
+                    //         functionname: 'getGeoCMRToAjax', 
+                    //         paPoint: myPoint
+                    //     },
+                    //     success : function (result, status, erro) {
+                    //         highLightObj(result);
+                    //     },
+                    //     error: function (req, status, error) {
+                    //         alert(req + " " + status + " " + error);
+                    //     }
+                    // });
                 });
             };
         </script>
