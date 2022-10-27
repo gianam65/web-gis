@@ -82,11 +82,29 @@
                 searchResultDiv.innerHTML  = htmlElement;
             }
 
+            function calcCenterCoordinates(listOfCoordinates) {
+                if(!listOfCoordinates || !Array.isArray(listOfCoordinates)) return
+                let sumLonCoor = 0;
+                let sumLatCoor = 0;
+                let lengthOfCoordinates = listOfCoordinates.length
+                for(let i = 0; i < lengthOfCoordinates; i++) {
+                    sumLonCoor += listOfCoordinates[i][0];
+                    sumLatCoor += listOfCoordinates[i][1];
+                }
+                
+                return [sumLonCoor / lengthOfCoordinates, sumLatCoor / lengthOfCoordinates]
+            }
+
             function moveToLocation(listPoint) {
                 highLightObj(JSON.stringify(listPoint))
                 
-                // map.getView().setCenter(test);
-                // map.getView().setZoom(5);
+                const centerCoordinates = calcCenterCoordinates(listPoint.coordinates.flat(2))
+                map.getView().animate({
+                    center: ol.proj.fromLonLat(centerCoordinates),
+                    duration: 2500,
+                    zoom: 16,
+                    rotation: 10
+                });
             }
 
             function createJsonObj(result) {     
