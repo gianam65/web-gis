@@ -32,6 +32,21 @@
         }
     }
 
+    if(isset($_POST['inCalcMode'])) {
+        $paPDO = initDB();
+        $startedValue = $_POST['startedPoint'];
+        $endValue = $_POST['endPoint'];
+        $mySQLStr = "SELECT ST_Distance('$startedValue'::geometry, '$endValue'::geometry) as distance";
+        
+        $result = query($paPDO, $mySQLStr);
+
+        if ($result != null) {
+            echo json_encode($result);
+        } else {
+            return null;
+        }
+    }
+
     function initDB()
     {
         // Kết nối CSDL

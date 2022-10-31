@@ -52,14 +52,16 @@ body, html {
 
 .search-result {
     /* margin + height element */
-    max-height: calc(100% - 24px - 12px - 36px);
-    height: calc(100% - 24px - 12px - 36px);
+    max-height: calc(100% - 24px - 12px - 36px - 10px);
+    height: calc(100% - 24px - 12px - 36px - 10px);
     display: flex;
     flex-direction: column;
     text-align: left;
     padding: 5px;
     font-size: 14px;
     overflow: auto;
+    border-radius: 4px;
+    margin-top: 10px;
 }
 
 .search-result::-webkit-scrollbar {
@@ -145,3 +147,19 @@ body, html {
     top: 100%;
     left: 5%;
 } */
+
+#select-location-1, #select-location-2 {
+    width: 100%;
+}
+
+.calc-distance {
+    margin-top: 20px;
+}
+
+#distance-box {
+    display: none;
+}
+
+#distance-box .search-title {
+    color: #1890ff;
+}
