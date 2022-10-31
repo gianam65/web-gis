@@ -40,7 +40,7 @@
         <div class="ol-popup" id="popup">
             <div id="popup-content"></div>
         </div>
-        <?php include 'CMR_pgsqlAPI.php' ?>
+        <?php include 'pgsqlAPI.php' ?>
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
         <script>
             var container = document.getElementById("popup");
@@ -74,7 +74,7 @@
                 const searchValue = e.target.value
                 $.ajax({
                     type: "POST",
-                    url: "CMR_pgsqlAPI.php",
+                    url: "pgsqlAPI.php",
                     data: { inSearchMode: true, searchValue: searchValue},
                     success : function (result, status, erro) {
                         const dataToRender = ["Từ khóa tìm kiếm không hợp lệ"].includes(result) ? result : JSON.parse(result || "[]" ); 
@@ -112,7 +112,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "CMR_pgsqlAPI.php",
+                    url: "pgsqlAPI.php",
                     data: { inCalcMode: true, startedPoint: `POINT(${startLonlat[0]} ${startLonlat[1]})`, endPoint: `POINT(${endLonlat[0]} ${endLonlat[1]})`},
                     success : function (result, status, erro) {
                         const distanceResult = JSON.parse(result)[0].distance;
@@ -145,7 +145,9 @@
                 if(data.length == 0) {
                    htmlElement = '<div class="no-data"><span>Không tìm thấy dữ liệu</span></div>';     
                 } else {
-                    document.getElementById("distance-box").style.display = 'block';
+                    if(data.length > 2) {
+                        document.getElementById("distance-box").style.display = 'block';
+                    }
                     for(let i = 0; i < data.length; i++) {
                         htmlElement += `
                             <div class="search-result-item" onclick='moveToLocation(${data[i].geo}, "${data[i].name}")'>${data[i].name}</div>
@@ -274,7 +276,7 @@
                     // var myPoint = 'POINT(' + lon + ' ' + lat + ')';
                     // $.ajax({
                     //     type: "POST",
-                    //     url: "CMR_pgsqlAPI.php",
+                    //     url: "pgsqlAPI.php",
                     //     data: {
                     //         functionname: 'getGeoCMRToAjax', 
                     //         paPoint: myPoint
