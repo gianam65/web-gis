@@ -250,7 +250,7 @@
                             'FORMAT': format,
                             'VERSION': '1.1.1',
                             STYLES: '',
-                            LAYERS: 'example:border_vn_map',
+                            LAYERS: 'example:wrap_border_vn',
                         }
                     })
                 });
